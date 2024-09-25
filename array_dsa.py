@@ -1,5 +1,4 @@
-import random
-
+import helper
 class Array:
   def __init__(self) -> None:
     self.array = []
@@ -32,12 +31,9 @@ class Array:
       print(self.array[index], end=" ")
     print("\n")
 
-def generateRandomArray(numberOfElements: int) -> list[int]:
-  return [random.randint(0, 200) for _ in range(0, numberOfElements)]
-
 def runBasicOperation():
   array = Array()
-  randomArray = generateRandomArray(numberOfElements = 20)
+  randomArray = helper.generateRandomArray(numberOfElements = 20)
   for element in randomArray:
       array.insert(element)
   print("The values of array before removing")
