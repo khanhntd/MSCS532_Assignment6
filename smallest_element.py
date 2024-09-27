@@ -68,7 +68,7 @@ def medianOfMedians(array: list[int], low: int, high: int, kth: int) -> int:
   for currentIndex in range(0, numberOfElements, 5):
       subarray = array[low + currentIndex:min(low + currentIndex + 5, high + 1)]
       medians.append(sorted(subarray)[len(subarray) // 2])
-
+  # https://medium.com/@amit.desai03/median-of-median-on-medium-5ed518f17307
   mOfMedians = medianOfMedians(medians, 0, len(medians) - 1, len(medians) // 2)
 
   pivotIndex = partitionArray(array, low, high, array.index(mOfMedians))
