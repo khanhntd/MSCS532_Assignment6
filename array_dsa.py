@@ -22,7 +22,7 @@ class Array:
   def access(self, index: int) -> int:
     if index < 0 or index > len(self.array) - 1:
       print("Invalid index ", index)
-      return
+      return -1
 
     return self.array[index]
 
@@ -34,6 +34,7 @@ class Array:
 def runBasicOperation():
   array = Array()
   randomArray = helper.generateRandomArray(numberOfElements = 20)
+  print("Generate array with random array", randomArray)
   for element in randomArray:
       array.insert(element)
   print("The values of array before removing")
