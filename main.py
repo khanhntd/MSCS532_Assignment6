@@ -10,5 +10,5 @@ if __name__ =="__main__":
  #stack_dsa.runBasicOperation()
  #queue_dsa.runBasicOperation()
  #linked_list_dsa.runBasicOperation()
- #smallest_element.runBasicOperation()
- matrices_dsa.runBasicOperation()
+ smallest_element.runBasicOperation()
+ #matrices_dsa.runBasicOperation()

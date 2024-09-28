@@ -1,83 +1,88 @@
 import helper
 import random
 
-def partitionArray(array: list[int], low: int, high: int, pivotIndex: int = -1) -> int:
-  if pivotIndex < 0:
-    pivotIndex = random.randint(low, high)
-
-  array[pivotIndex], array[high] = array[high], array[pivotIndex]
+# partitionArray will partition the array based on the pivot which can be chosen from median of median
+# https://medium.com/@amit.desai03/median-of-median-on-medium-5ed518f17307; however, for simplicity, we will choose
+# the last element of the array. Afterwards, return the pivot index to divide and conquer
+def partitionArray(array: list[int], low: int, high: int) -> int:
   pivot = array[high]
-  swapStartingIndex = low
+
+  swapStartingIndex = low - 1
   # Partition the array based on the pivot:
   # The left side will be smaller than the pivot
   # The right side will be larger than the pivot
   for currentIndex in range(low, high):
     if array[currentIndex] < pivot:
-      array[currentIndex], array[swapStartingIndex] = array[swapStartingIndex], array[currentIndex]
       swapStartingIndex +=1
+      array[currentIndex], array[swapStartingIndex] = array[swapStartingIndex], array[currentIndex]
 
   # Swap the pivot element with the next element of the array's left side
   # to divide the array into two parts completely
-  array[swapStartingIndex], array[high] = array[high], array[swapStartingIndex]
-  return swapStartingIndex
+  array[swapStartingIndex + 1], array[high] = array[high], array[swapStartingIndex + 1]
+  return swapStartingIndex + 1
 
-# quickSelect will follow two steps:
+
+# randomizedQuickSelect will follow three steps:
 # Step 1: Choose the pivot randomly
 # Step 2: Partition the array, which includes splitting and reordering
 # the array so that all elements smaller than the pivot are on the left
 # and all elements larger than the pivot are on the right
 # Step 3:
-# * If the kth is smaller than pivot, that mean the kth should be on the left sub array
-# * If the kth is larger than pivot, that mean the kth should be on the right sub array
-# * If the kth is equal to pivot, that mean we have the kth smallest element
-# Time complexity: O(nlog n) (worst case is O(n^2) for nearly sorted one)
-# Space complexity: O(log n) (O(n) for nearly sorted one)
-def quickSelect(array: list[int], low: int, high: int, kth: int) -> int:
-  if low == high:
-      return array[low]
+# * If the kth is smaller than left array number of elements, that mean the kth should be on the left sub array
+# * If the kth is within the range of pivot, then the kth should be the pivot
+# * If the k is larger than the range of pivot, then the kth should be the the right sub array
+# Time complexity: O(n) (worst case is O(n^2)
+# Space complexity: O(n)
+def randomizedQuickSelect(array: list[int], kth: int) -> int:
+  if len(array) == 1:
+        return array[0]
 
-  pivotIndex = partitionArray(array, low, high)
-  if pivotIndex == kth:
-    return array[pivotIndex]
-  elif kth < pivotIndex:
-    return quickSelect(array,low, pivotIndex - 1, kth)
+  pivot = random.choice(array)
+  leftArray = [element for element in array if element < pivot]
+  rightArray = [element for element in array if element > pivot]
+  pivotCount = array.count(pivot)
 
-  return quickSelect(array,pivotIndex + 1, high, kth)
+  if kth < len(leftArray):
+    return randomizedQuickSelect(leftArray, kth)
+  elif kth < len(leftArray) + pivotCount:
+    return pivot
 
-# quickSelect will follow two steps:
+  return randomizedQuickSelect(rightArray, kth - len(leftArray) - pivotCount)
+
+# medianOfMedians will follow three steps:
 # Step 1: Choose the pivot randomly based on median of medians
 # Step 2: Partition the array, which includes splitting and reordering
 # the array so that all elements smaller than the pivot are on the left
 # and all elements larger than the pivot are on the right
 # Step 3:
-# * If the kth is smaller than pivot, that mean the kth should be on the left sub array
-# * If the kth is larger than pivot, that mean the kth should be on the right sub array
-# * If the kth is equal to pivot, that mean we have the kth smallest element
-# Time complexity: O(nlog n) (worst case is O(n^2) for nearly sorted one)
-# Space complexity: O(log n) (O(n) for nearly sorted one)
-# Time complexity: O(nlog n) (worst case is O(n^2) for nearly sorted one)
-# Space complexity: O(log n) (O(n) for nearly sorted one)
-def medianOfMedians(array: list[int], low: int, high: int, kth: int) -> int:
-  if low == high:
-      return array[low]
+# * If the kth is smaller than left array number of elements, that mean the kth should be on the left sub array
+# * If the kth is within the range of pivot, then the kth should be the pivot
+# * If the k is larger than the range of pivot, then the kth should be the the right sub array
+# Time complexity: O(n)
+# Space complexity: O(n)
+def medianOfMedians(array: list[int], kth: int) -> int:
+  if len(array) <= 5:
+      return sorted(array)[kth]
 
-  numberOfElements = high - low + 1
   medians = []
-
   # Divide into 5 groups
-  for currentIndex in range(0, numberOfElements, 5):
-      subarray = array[low + currentIndex:min(low + currentIndex + 5, high + 1)]
+  for currentIndex in range(0, len(array), 5):
+      subarray = array[currentIndex:currentIndex + 5]
       medians.append(sorted(subarray)[len(subarray) // 2])
+
   # https://medium.com/@amit.desai03/median-of-median-on-medium-5ed518f17307
-  mOfMedians = medianOfMedians(medians, 0, len(medians) - 1, len(medians) // 2)
+  pivot = medianOfMedians(medians, len(medians) // 2)
+  leftArray = [element for element in array if element < pivot]
+  rightArray = [element for element in array if element > pivot]
+  pivotCount = array.count(pivot)
 
-  pivotIndex = partitionArray(array, low, high, array.index(mOfMedians))
-  if pivotIndex == kth:
-    return array[pivotIndex]
-  elif kth < pivotIndex:
-    return quickSelect(array,low, pivotIndex - 1, kth)
 
-  return quickSelect(array,pivotIndex + 1, high, kth)
+  if kth < len(leftArray):
+    return randomizedQuickSelect(leftArray, kth)
+  elif kth < len(leftArray) + pivotCount:
+    return pivot
+
+  return randomizedQuickSelect(rightArray, kth - len(leftArray) - pivotCount)
 
 # printArray will print all the elements in the array
 def printArray(array: list[int]):
@@ -111,11 +116,11 @@ def runBasicOperation():
   print("Before finding the kth smallest element")
   printArray(array)
 
-  print("The smallest 3 element with quickselect is", quickSelect(array, 0, len(array) - 1, 2))
-  print("The smallest 6 element with quickselect is", quickSelect(array, 0, len(array) - 1, 5))
+  print("The smallest 3 element with quickselect is", randomizedQuickSelect(array, 2))
+  print("The smallest 6 element with quickselect is", randomizedQuickSelect(array, 5))
 
-  print("The smallest 3 element with median of medians is", medianOfMedians(array, 0, len(array) - 1, 2))
-  print("The smallest 6 element with median of medians is", medianOfMedians(array, 0, len(array) - 1, 5))
+  print("The smallest 3 element with median of medians is", medianOfMedians(array, 2))
+  print("The smallest 6 element with median of medians is", medianOfMedians(array, 5))
 
   print("Sorting array for easier visiblity for finding the kth smallest element")
   quickSort(array, 0, len(array) - 1)

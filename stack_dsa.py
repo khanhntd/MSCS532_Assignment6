@@ -4,7 +4,7 @@ class Stack:
   def __init__(self) -> None:
     self.stack = []
 
-  # Insert an element to the stack as FILO
+  # Insert an element to the stack as LIFO
   # Time Complexity: O(n) (when shifting the elements to new stack)
   # https://stackoverflow.com/a/7770654
   def insert(self, value: int) -> None:
